@@ -300,6 +300,9 @@ struct InputSectionView: View {
           value: $viewModel.quantity
         )
 
+        // Wood Species Picker
+        WoodSpeciesPickerField(value: $viewModel.woodSpecies)
+
         // Price Input
         VStack(alignment: .leading, spacing: 6) {
           Text("Price ($)")
@@ -322,7 +325,7 @@ struct InputSectionView: View {
 
       Button(action: {
         viewModel.addBoard()
-        // Clear dimension fields after adding (keep price to persist)
+        // Clear dimension fields after adding (keep price and wood species to persist)
         viewModel.thickness = ""
         viewModel.width = ""
         viewModel.length = ""
@@ -407,6 +410,93 @@ struct ThicknessQuartersInputField: View {
           .foregroundColor(.darkBrown)
 
         Spacer()
+      }
+    }
+  }
+}
+
+// MARK: - Wood Species Picker Field
+struct WoodSpeciesPickerField: View {
+  @Binding var value: String
+  @State private var showingPicker = false
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      Text("Wood Species (Optional)")
+        .font(.subheadline)
+        .foregroundColor(.darkBrown.opacity(0.8))
+
+      HStack(spacing: 8) {
+        TextField("Type or select", text: $value)
+          .font(.body)
+          .foregroundColor(.darkBrown)
+          .padding(12)
+          .background(Color.white)
+          .clipShape(RoundedRectangle(cornerRadius: 8))
+          .overlay(
+            RoundedRectangle(cornerRadius: 8)
+              .stroke(Color.woodPrimary.opacity(0.3), lineWidth: 1)
+          )
+
+        Button(action: {
+          showingPicker = true
+        }) {
+          Image(systemName: "chevron.down.circle.fill")
+            .font(.title3)
+            .foregroundColor(.woodPrimary)
+        }
+      }
+    }
+    .sheet(isPresented: $showingPicker) {
+      WoodSpeciesPickerView(selectedSpecies: $value)
+    }
+  }
+}
+
+// MARK: - Wood Species Picker View
+struct WoodSpeciesPickerView: View {
+  @Environment(\.dismiss) private var dismiss
+  @Binding var selectedSpecies: String
+
+  var body: some View {
+    NavigationStack {
+      ZStack {
+        Color.creamBackground.ignoresSafeArea()
+
+        List {
+          ForEach(WoodSpecies.commonHardwoods, id: \.self) { species in
+            Button(action: {
+              selectedSpecies = species
+              dismiss()
+            }) {
+              HStack {
+                Text(species)
+                  .foregroundColor(.darkBrown)
+
+                Spacer()
+
+                if selectedSpecies == species {
+                  Image(systemName: "checkmark")
+                    .foregroundColor(.forestGreen)
+                    .fontWeight(.semibold)
+                }
+              }
+            }
+            .listRowBackground(Color.white)
+          }
+        }
+        .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+      }
+      .navigationTitle("Select Wood Species")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .navigationBarTrailing) {
+          Button("Done") {
+            dismiss()
+          }
+          .foregroundColor(.woodPrimary)
+        }
       }
     }
   }

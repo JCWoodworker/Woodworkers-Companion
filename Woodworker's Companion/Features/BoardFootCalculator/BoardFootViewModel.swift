@@ -19,6 +19,7 @@ class BoardFootViewModel {
   var width: String = ""
   var length: String = ""
   var quantity: String = "1"
+  var woodSpecies: String = ""
 
   // Pricing
   var pricingType: PricingType = .perBoardFoot
@@ -69,6 +70,9 @@ class BoardFootViewModel {
 
     let priceValue = Double(price)
 
+    let species = woodSpecies.trimmingCharacters(in: .whitespacesAndNewlines)
+    let speciesValue = species.isEmpty ? nil : species
+    
     // For linear pricing, thickness and width are optional/nil
     if pricingType == .linear {
       let board = BoardEntry(
@@ -79,15 +83,16 @@ class BoardFootViewModel {
         unit: selectedUnit,
         lengthUnit: selectedUnit == .imperial ? lengthUnit : nil,
         price: priceValue,
-        pricingType: pricingType
+        pricingType: pricingType,
+        woodSpecies: speciesValue
       )
       boards.append(board)
       return
     }
-
+    
     // For board foot pricing, need thickness and width
     guard let t = Double(thickness),
-      let w = Double(width)
+          let w = Double(width)
     else {
       return
     }
@@ -100,7 +105,8 @@ class BoardFootViewModel {
       unit: selectedUnit,
       lengthUnit: selectedUnit == .imperial ? lengthUnit : nil,
       price: priceValue,
-      pricingType: pricingType
+      pricingType: pricingType,
+      woodSpecies: speciesValue
     )
 
     boards.append(board)
@@ -127,6 +133,7 @@ class BoardFootViewModel {
     length = ""
     quantity = "1"
     price = ""
+    woodSpecies = ""
   }
 
   func applyPreset(_ preset: LumberPreset) {

@@ -19,6 +19,7 @@ struct EditBoardView: View {
   @State private var price: String
   @State private var pricingType: PricingType
   @State private var lengthUnit: LengthUnit
+  @State private var woodSpecies: String
 
   init(board: BoardEntry, onSave: @escaping (BoardEntry) -> Void) {
     self.board = board
@@ -32,6 +33,7 @@ struct EditBoardView: View {
     _price = State(initialValue: board.price.map { String($0) } ?? "")
     _pricingType = State(initialValue: board.pricingType)
     _lengthUnit = State(initialValue: board.lengthUnit ?? .feet)
+    _woodSpecies = State(initialValue: board.woodSpecies ?? "")
   }
 
   var canSave: Bool {
@@ -145,6 +147,9 @@ struct EditBoardView: View {
               value: $quantity
             )
 
+            // Wood Species
+            WoodSpeciesPickerField(value: $woodSpecies)
+
             // Price
             VStack(alignment: .leading, spacing: 6) {
               Text("Price ($)")
@@ -203,6 +208,8 @@ struct EditBoardView: View {
     }
 
     let priceValue = Double(price)
+    let species = woodSpecies.trimmingCharacters(in: .whitespacesAndNewlines)
+    let speciesValue = species.isEmpty ? nil : species
 
     let updatedBoard: BoardEntry
 
@@ -216,7 +223,8 @@ struct EditBoardView: View {
         unit: board.unit,
         lengthUnit: board.unit == .imperial ? lengthUnit : nil,
         price: priceValue,
-        pricingType: pricingType
+        pricingType: pricingType,
+        woodSpecies: speciesValue
       )
     } else {
       guard let t = Double(thickness),
@@ -234,7 +242,8 @@ struct EditBoardView: View {
         unit: board.unit,
         lengthUnit: board.unit == .imperial ? lengthUnit : nil,
         price: priceValue,
-        pricingType: pricingType
+        pricingType: pricingType,
+        woodSpecies: speciesValue
       )
     }
 

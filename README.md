@@ -217,9 +217,14 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
   - **Per Board Foot**: Calculate based on volume (thickness × width × length)
   - **Linear**: Calculate based on length only (great for trim, molding, etc.)
 - **Individual Board Pricing**: Each board can have its own price and pricing type
-- **Price Persistence**: Price persists across board entries until changed
+- **Wood Species Tracking**: Optional field to track wood type for each board
+  - Type custom species or select from 21 common hardwoods
+  - Alphabetically sorted list (Ash to Zebrawood)
+  - Species persists across board entries for convenience
+  - Displayed in board list and order history
+- **Price Persistence**: Price and wood species persist across board entries until changed
 - **Multiple Board Management**: Add different boards with different prices to calculate total project cost
-- **Edit Individual Boards**: Tap any board in the list to edit its dimensions, quantity, price, or pricing type
+- **Edit Individual Boards**: Tap any board in the list to edit its dimensions, quantity, price, pricing type, or wood species
 - **Running Totals**: Automatically calculates total board feet and total cost
 - **Order History**: Save and manage multiple orders with full history
   - Auto-save on export
@@ -248,6 +253,7 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
    - Width (only for Per Board Foot pricing; inches for Imperial, cm for Metric)
    - Length (feet or inches for Imperial using the toggle; cm for Metric)
    - Quantity
+   - Wood Species (optional - type or select from dropdown; persists until changed)
 4. Enter price (optional - persists for subsequent boards until changed)
 5. Tap "Add Board" to add to your list
 6. **Edit boards**: Tap any board in the "Added Boards" list to edit all its values
@@ -260,6 +266,7 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
 9. **View History**:
    - Tap "History" button in top right corner
    - View all saved orders (table on iPad, cards on iPhone)
+   - History shows primary wood species used in each order
    - **Tap** any order to view full details
    - **Swipe left** on any order for quick actions:
      - Delete this order

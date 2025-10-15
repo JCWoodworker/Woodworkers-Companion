@@ -25,6 +25,33 @@ enum PricingType: String, CaseIterable, Codable {
   case linear = "Linear"
 }
 
+// MARK: - Wood Species List
+struct WoodSpecies {
+  static let commonHardwoods: [String] = [
+    "Ash",
+    "Black Limba",
+    "Bloodwood",
+    "Cherry",
+    "Douglas Fir",
+    "Hickory",
+    "Maple",
+    "Maple (Ambrosia)",
+    "Maple (Birdseye)",
+    "Maple (Curly)",
+    "Oak (Red)",
+    "Oak (White)",
+    "Padauk",
+    "Pine",
+    "Poplar",
+    "Purple Heart",
+    "Tigerwood",
+    "Walnut (Black)",
+    "Walnut (Peruvian)",
+    "Wenge",
+    "Zebrawood",
+  ]
+}
+
 // MARK: - Board Entry
 struct BoardEntry: Identifiable, Codable, Equatable {
   let id: UUID
@@ -36,10 +63,12 @@ struct BoardEntry: Identifiable, Codable, Equatable {
   let lengthUnit: LengthUnit?  // Only used for Imperial
   let price: Double?
   let pricingType: PricingType
+  let woodSpecies: String?
 
   init(
     id: UUID = UUID(), thickness: Double?, width: Double?, length: Double, quantity: Int,
-    unit: MeasurementUnit, lengthUnit: LengthUnit?, price: Double?, pricingType: PricingType
+    unit: MeasurementUnit, lengthUnit: LengthUnit?, price: Double?, pricingType: PricingType,
+    woodSpecies: String?
   ) {
     self.id = id
     self.thickness = thickness
@@ -50,6 +79,7 @@ struct BoardEntry: Identifiable, Codable, Equatable {
     self.lengthUnit = lengthUnit
     self.price = price
     self.pricingType = pricingType
+    self.woodSpecies = woodSpecies
   }
 
   // Equatable conformance
@@ -104,15 +134,16 @@ struct BoardEntry: Identifiable, Codable, Equatable {
   // Formatted display
   var displayString: String {
     let quantityStr = quantity > 1 ? "\(quantity) × " : ""
+    let speciesStr = woodSpecies.map { " - \($0)" } ?? ""
 
     if pricingType == .linear {
       // Linear only shows length
       switch unit {
       case .imperial:
         let lengthSymbol = lengthUnit == .inches ? "\"" : "'"
-        return "\(quantityStr)\(length)\(lengthSymbol)"
+        return "\(quantityStr)\(length)\(lengthSymbol)\(speciesStr)"
       case .metric:
-        return "\(quantityStr)\(length)cm"
+        return "\(quantityStr)\(length)cm\(speciesStr)"
       }
     }
 
@@ -123,9 +154,10 @@ struct BoardEntry: Identifiable, Codable, Equatable {
       // Show thickness in quarters format
       let thicknessInt = Int(thickness)
       let lengthSymbol = lengthUnit == .inches ? "\"" : "'"
-      return "\(quantityStr)\(thicknessInt)/4\" × \(width)\" × \(length)\(lengthSymbol)"
+      return
+        "\(quantityStr)\(thicknessInt)/4\" × \(width)\" × \(length)\(lengthSymbol)\(speciesStr)"
     case .metric:
-      return "\(quantityStr)\(thickness)cm × \(width)cm × \(length)cm"
+      return "\(quantityStr)\(thickness)cm × \(width)cm × \(length)cm\(speciesStr)"
     }
   }
 }
