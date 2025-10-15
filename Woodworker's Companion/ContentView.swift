@@ -107,7 +107,7 @@ struct ToolTile: View {
   @ViewBuilder
   private func destinationView(for toolId: Int) -> some View {
     switch toolId {
-    case 1: Tool1View()
+    case 1: BoardFootCalculatorView()
     case 2: Tool2View()
     case 3: Tool3View()
     case 4: Tool4View()
@@ -176,7 +176,7 @@ struct ContentView: View {
         }
         .background(Color.creamBackground.ignoresSafeArea())
       }
-      .navigationBarHidden(true)
+      .toolbar(.hidden, for: .navigationBar)
     }
   }
 }

@@ -41,7 +41,7 @@ struct Tool9View: View {
         Spacer()
       }
     }
-    .navigationBarHidden(true)
+    .toolbar(.hidden, for: .navigationBar)
   }
 }
 

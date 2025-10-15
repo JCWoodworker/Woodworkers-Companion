@@ -26,8 +26,10 @@ The app uses a feature-based organization for easy development and scalability:
 ```
 Woodworker's Companion/
 ├── Features/
-│   ├── Tool1/
-│   │   └── Tool1View.swift
+│   ├── BoardFootCalculator/
+│   │   ├── BoardFootCalculatorView.swift
+│   │   ├── BoardFootModels.swift
+│   │   └── BoardFootViewModel.swift
 │   ├── Tool2/
 │   │   └── Tool2View.swift
 │   ├── Tool3/
@@ -125,18 +127,18 @@ The main page grid automatically adjusts based on the tools array:
 
 1. **Create the folder and view:**
    ```bash
-   mkdir "Woodworker's Companion/Features/Tool10"
+   mkdir "Woodworker's Companion/Features/MyNewTool"
    ```
 
-2. **Create the view file** (`Tool10View.swift`):
+2. **Create the view file** (`MyNewToolView.swift`):
    ```swift
-   struct Tool10View: View {
+   struct MyNewToolView: View {
      @Environment(\.dismiss) private var dismiss
      
      var body: some View {
        ZStack {
          Color.creamBackground.ignoresSafeArea()
-         Text("Tool 10")
+         Text("My New Tool")
            .font(.largeTitle)
            .fontWeight(.bold)
            .foregroundColor(.darkBrown)
@@ -157,7 +159,7 @@ The main page grid automatically adjusts based on the tools array:
            Spacer()
          }
        }
-       .navigationBarHidden(true)
+       .toolbar(.hidden, for: .navigationBar)
      }
    }
    ```
@@ -166,7 +168,7 @@ The main page grid automatically adjusts based on the tools array:
    ```swift
    static let allTools: [Tool] = [
      // ... existing tools
-     Tool(id: 10, name: "Tool 10"),
+     Tool(id: 10, name: "My New Tool"),
    ]
    ```
 
@@ -175,7 +177,7 @@ The main page grid automatically adjusts based on the tools array:
    private func destinationView(for toolId: Int) -> some View {
      switch toolId {
        // ... existing cases
-       case 10: Tool10View()
+       case 10: MyNewToolView()
        default: Text("Tool not found")
      }
    }
@@ -200,6 +202,45 @@ Each tool is designed to function as an independent mini-app within the main app
 2. **Develop the tool's features** in its view file
 3. **Add additional files** to the tool's folder as needed (models, helpers, etc.)
 4. **Test independently** using SwiftUI previews
+
+## Tools
+
+### Board Foot Calculator
+
+A comprehensive calculator for woodworkers to calculate board feet for lumber projects.
+
+**Features:**
+- **Dual Unit Support**: Toggle between Imperial (inches/feet) and Metric (cm) measurements
+- **Quarters System**: Imperial thickness uses industry-standard quarters (4/4, 8/4, etc.)
+- **Length Flexibility**: Toggle between feet and inches for Imperial length measurements
+- **Flexible Pricing Options**:
+  - **Per Board Foot**: Calculate based on volume (thickness × width × length)
+  - **Linear**: Calculate based on length only (great for trim, molding, etc.)
+- **Individual Board Pricing**: Each board can have its own price and pricing type
+- **Price Persistence**: Price persists across board entries until changed
+- **Multiple Board Management**: Add different boards with different prices to calculate total project cost
+- **Running Totals**: Automatically calculates total board feet and total cost
+- **Export/Share**: Export calculations as formatted text for sharing or saving
+
+**How to Use:**
+1. Select your preferred unit system (Imperial or Metric)
+2. Choose pricing type:
+   - **Per Board Foot**: For dimensioned lumber (shows thickness and width inputs)
+   - **Linear**: For linear materials like trim (hides thickness and width inputs)
+3. Enter board dimensions:
+   - Thickness (only for Per Board Foot pricing; quarters for Imperial, cm for Metric)
+   - Width (only for Per Board Foot pricing; inches for Imperial, cm for Metric)
+   - Length (feet or inches for Imperial using the toggle; cm for Metric)
+   - Quantity
+4. Enter price (optional - persists for subsequent boards until changed)
+5. Tap "Add Board" to add to your list
+6. View individual board costs and totals in the summary section
+7. Export or share your calculations when done
+
+**Files:**
+- `BoardFootCalculatorView.swift` - Main UI
+- `BoardFootModels.swift` - Data models and calculation logic
+- `BoardFootViewModel.swift` - State management
 
 ## Color Extensions
 
