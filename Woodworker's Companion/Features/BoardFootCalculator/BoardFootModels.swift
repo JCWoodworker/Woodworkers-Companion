@@ -8,26 +8,26 @@
 import Foundation
 
 // MARK: - Measurement Unit
-enum MeasurementUnit: String, CaseIterable {
+enum MeasurementUnit: String, CaseIterable, Codable {
   case imperial = "Imperial"
   case metric = "Metric"
 }
 
 // MARK: - Length Unit (for Imperial)
-enum LengthUnit: String, CaseIterable {
+enum LengthUnit: String, CaseIterable, Codable {
   case feet = "ft"
   case inches = "in"
 }
 
 // MARK: - Pricing Type
-enum PricingType: String, CaseIterable {
+enum PricingType: String, CaseIterable, Codable {
   case perBoardFoot = "Per Board Foot"
   case linear = "Linear"
 }
 
 // MARK: - Board Entry
-struct BoardEntry: Identifiable {
-  let id = UUID()
+struct BoardEntry: Identifiable, Codable, Equatable {
+  let id: UUID
   let thickness: Double?
   let width: Double?
   let length: Double
@@ -36,6 +36,26 @@ struct BoardEntry: Identifiable {
   let lengthUnit: LengthUnit?  // Only used for Imperial
   let price: Double?
   let pricingType: PricingType
+
+  init(
+    id: UUID = UUID(), thickness: Double?, width: Double?, length: Double, quantity: Int,
+    unit: MeasurementUnit, lengthUnit: LengthUnit?, price: Double?, pricingType: PricingType
+  ) {
+    self.id = id
+    self.thickness = thickness
+    self.width = width
+    self.length = length
+    self.quantity = quantity
+    self.unit = unit
+    self.lengthUnit = lengthUnit
+    self.price = price
+    self.pricingType = pricingType
+  }
+
+  // Equatable conformance
+  static func == (lhs: BoardEntry, rhs: BoardEntry) -> Bool {
+    lhs.id == rhs.id
+  }
 
   // Calculate board feet for this entry
   var boardFeet: Double {

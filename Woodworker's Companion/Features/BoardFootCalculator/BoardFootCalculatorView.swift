@@ -11,6 +11,8 @@ struct BoardFootCalculatorView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var viewModel = BoardFootViewModel()
   @State private var showingExportSheet = false
+  @State private var showingSaveOrderSheet = false
+  @State private var showingHistory = false
 
   var body: some View {
     ZStack(alignment: .topLeading) {
@@ -30,6 +32,25 @@ struct BoardFootCalculatorView: View {
 
           // Input Section (includes pricing)
           InputSectionView(viewModel: viewModel)
+
+          // Save Order Button (only shows when boards exist)
+          if !viewModel.boards.isEmpty {
+            Button(action: {
+              showingSaveOrderSheet = true
+            }) {
+              HStack {
+                Image(systemName: "square.and.arrow.down")
+                Text("Save Order")
+                  .fontWeight(.semibold)
+              }
+              .foregroundColor(.white)
+              .frame(maxWidth: .infinity)
+              .padding(.vertical, 12)
+              .background(Color.woodPrimary)
+              .clipShape(RoundedRectangle(cornerRadius: 10))
+              .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+            }
+          }
 
           // Board List
           if !viewModel.boards.isEmpty {
@@ -69,11 +90,72 @@ struct BoardFootCalculatorView: View {
       .padding(.leading, 20)
       .padding(.top, 20)
       .zIndex(100)
+
+      // History button in top right
+      VStack {
+        HStack {
+          Spacer()
+
+          Button(action: {
+            showingHistory = true
+          }) {
+            Text("History")
+              .font(.subheadline)
+              .fontWeight(.semibold)
+              .foregroundColor(.white)
+              .padding(.horizontal, 16)
+              .padding(.vertical, 8)
+              .background(Color.woodPrimary)
+              .clipShape(RoundedRectangle(cornerRadius: 8))
+              .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+          }
+          .padding(.trailing, 20)
+          .padding(.top, 20)
+        }
+
+        Spacer()
+      }
+      .zIndex(100)
     }
     .toolbar(.hidden, for: .navigationBar)
     .sheet(isPresented: $showingExportSheet) {
-      ExportSheetView(exportData: viewModel.exportData())
+      ExportSheetView(
+        exportData: viewModel.exportData(),
+        onExport: {
+          // Auto-save when exporting
+          saveCurrentOrder()
+        }
+      )
     }
+    .sheet(isPresented: $showingSaveOrderSheet) {
+      SaveOrderView(boards: viewModel.boards) { orderName in
+        let savedOrder = SavedOrder(orderName: orderName, boards: viewModel.boards)
+        OrderPersistenceManager.shared.saveOrder(savedOrder)
+        // Reset form completely after saving
+        viewModel.clearAll()
+        OrderPersistenceManager.shared.clearWorkInProgress()
+      }
+    }
+    .fullScreenCover(isPresented: $showingHistory) {
+      HistoryView()
+    }
+    .onAppear {
+      // Load work in progress
+      if let savedBoards = OrderPersistenceManager.shared.loadWorkInProgress() {
+        viewModel.boards = savedBoards
+      }
+    }
+    .onChange(of: viewModel.boards) { oldValue, newValue in
+      // Auto-save work in progress
+      OrderPersistenceManager.shared.saveWorkInProgress(boards: newValue)
+    }
+  }
+
+  private func saveCurrentOrder() {
+    guard !viewModel.boards.isEmpty else { return }
+    let orderName = "Order \(OrderPersistenceManager.shared.getNextOrderNumber())"
+    let savedOrder = SavedOrder(orderName: orderName, boards: viewModel.boards)
+    OrderPersistenceManager.shared.saveOrder(savedOrder)
   }
 }
 
@@ -559,6 +641,7 @@ struct ActionButtonsView: View {
 struct ExportSheetView: View {
   @Environment(\.dismiss) private var dismiss
   let exportData: String
+  let onExport: () -> Void
 
   var body: some View {
     NavigationStack {
@@ -594,10 +677,14 @@ struct ExportSheetView: View {
       .toolbar {
         ToolbarItem(placement: .navigationBarTrailing) {
           Button("Done") {
+            onExport()  // Call the auto-save
             dismiss()
           }
           .foregroundColor(.woodPrimary)
         }
+      }
+      .onAppear {
+        onExport()  // Also auto-save when sheet appears
       }
     }
   }
