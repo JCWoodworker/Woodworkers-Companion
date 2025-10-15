@@ -38,7 +38,12 @@ struct SavedOrder: Identifiable, Codable {
 
     for (index, board) in boards.enumerated() {
       output += "Board \(index + 1):\n"
-      output += "  Dimensions: \(board.displayString)\n"
+
+      if let species = board.woodSpecies {
+        output += "  Species: \(species)\n"
+      }
+
+      output += "  Dimensions: \(board.displayStringWithoutSpecies)\n"
 
       if board.pricingType == .perBoardFoot {
         output += "  Board Feet: \(String(format: "%.2f", board.boardFeet)) bf\n"
@@ -54,8 +59,29 @@ struct SavedOrder: Identifiable, Codable {
 
     output += String(repeating: "-", count: 50) + "\n"
 
+    // Break down board feet by species
     if totalBoardFeet > 0 {
-      output += "TOTAL BOARD FEET: \(String(format: "%.2f", totalBoardFeet)) bf\n"
+      var speciesBreakdown: [String: (boardFeet: Double, cost: Double)] = [:]
+
+      for board in boards {
+        if board.pricingType == .perBoardFoot && board.boardFeet > 0 {
+          let species = board.woodSpecies ?? "Misc"
+          let current = speciesBreakdown[species] ?? (boardFeet: 0, cost: 0)
+          speciesBreakdown[species] = (
+            boardFeet: current.boardFeet + board.boardFeet,
+            cost: current.cost + board.cost
+          )
+        }
+      }
+
+      if !speciesBreakdown.isEmpty {
+        output += "BOARD FEET BY SPECIES:\n"
+        for (species, data) in speciesBreakdown.sorted(by: { $0.key < $1.key }) {
+          output +=
+            "  \(species): \(String(format: "%.2f", data.boardFeet)) bf - $\(String(format: "%.2f", data.cost))\n"
+        }
+        output += "\n"
+      }
     }
 
     if totalCost > 0 {

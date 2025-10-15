@@ -160,6 +160,35 @@ struct BoardEntry: Identifiable, Codable, Equatable {
       return "\(quantityStr)\(thickness)cm × \(width)cm × \(length)cm\(speciesStr)"
     }
   }
+
+  // Formatted display without species (for export text)
+  var displayStringWithoutSpecies: String {
+    let quantityStr = quantity > 1 ? "\(quantity) × " : ""
+
+    if pricingType == .linear {
+      // Linear only shows length
+      switch unit {
+      case .imperial:
+        let lengthSymbol = lengthUnit == .inches ? "\"" : "'"
+        return "\(quantityStr)\(length)\(lengthSymbol)"
+      case .metric:
+        return "\(quantityStr)\(length)cm"
+      }
+    }
+
+    guard let thickness = thickness, let width = width else { return "" }
+
+    switch unit {
+    case .imperial:
+      // Show thickness in quarters format
+      let thicknessInt = Int(thickness)
+      let lengthSymbol = lengthUnit == .inches ? "\"" : "'"
+      return
+        "\(quantityStr)\(thicknessInt)/4\" × \(width)\" × \(length)\(lengthSymbol)"
+    case .metric:
+      return "\(quantityStr)\(thickness)cm × \(width)cm × \(length)cm"
+    }
+  }
 }
 
 // MARK: - Common Lumber Sizes
