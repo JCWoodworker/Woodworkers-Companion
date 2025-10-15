@@ -9,9 +9,15 @@ import SwiftUI
 
 struct HistoryView: View {
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @State private var savedOrders: [SavedOrder] = []
   @State private var selectedOrder: SavedOrder? = nil
-  @State private var showingOrderDetail = false
+  @State private var showingDeleteAllConfirmation = false
+  @State private var orderToEdit: SavedOrder? = nil
+
+  var isCompactDevice: Bool {
+    horizontalSizeClass == .compact
+  }
 
   var body: some View {
     ZStack(alignment: .topLeading) {
@@ -23,7 +29,7 @@ struct HistoryView: View {
           .font(.title)
           .fontWeight(.bold)
           .foregroundColor(.darkBrown)
-          .padding(.top, 60)
+          .padding(.top, 80)
           .frame(maxWidth: .infinity, alignment: .center)
 
         if savedOrders.isEmpty {
@@ -43,51 +49,136 @@ struct HistoryView: View {
 
           Spacer()
         } else {
-          // Table Header
-          HStack(spacing: 8) {
-            Text("Order Name")
-              .font(.caption)
-              .fontWeight(.semibold)
-              .foregroundColor(.darkBrown)
-              .frame(maxWidth: .infinity, alignment: .leading)
+          // Delete All Button
+          HStack {
+            Spacer()
 
-            Text("Date")
-              .font(.caption)
-              .fontWeight(.semibold)
-              .foregroundColor(.darkBrown)
-              .frame(width: 80, alignment: .leading)
-
-            Text("Time")
-              .font(.caption)
-              .fontWeight(.semibold)
-              .foregroundColor(.darkBrown)
-              .frame(width: 70, alignment: .leading)
-
-            Text("Total")
-              .font(.caption)
-              .fontWeight(.semibold)
-              .foregroundColor(.darkBrown)
-              .frame(width: 70, alignment: .trailing)
-          }
-          .padding(.horizontal, 16)
-          .padding(.vertical, 12)
-          .background(Color.woodPrimary.opacity(0.2))
-          .clipShape(RoundedRectangle(cornerRadius: 8))
-          .padding(.horizontal, 20)
-
-          // Orders List
-          ScrollView {
-            VStack(spacing: 8) {
-              ForEach(savedOrders) { order in
-                OrderRow(order: order)
-                  .onTapGesture {
-                    selectedOrder = order
-                    showingOrderDetail = true
-                  }
+            Button(action: {
+              showingDeleteAllConfirmation = true
+            }) {
+              HStack(spacing: 6) {
+                Image(systemName: "trash")
+                  .font(.caption)
+                Text("Delete All")
+                  .font(.caption)
+                  .fontWeight(.semibold)
               }
+              .foregroundColor(.white)
+              .padding(.horizontal, 12)
+              .padding(.vertical, 8)
+              .background(Color.red.opacity(0.7))
+              .clipShape(RoundedRectangle(cornerRadius: 8))
+              .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
             }
+          }
+          .padding(.horizontal, 20)
+          .padding(.bottom, 8)
+          // Show cards for compact devices, table for regular
+          if isCompactDevice {
+            // Card View for iPhone and iPad mini
+            ScrollView {
+              VStack(spacing: 12) {
+                ForEach(savedOrders) { order in
+                  OrderCard(order: order)
+                    .onTapGesture {
+                      selectedOrder = order
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                      Button(role: .destructive) {
+                        deleteOrder(order)
+                      } label: {
+                        Label("Delete", systemImage: "trash")
+                      }
+
+                      Button {
+                        orderToEdit = order
+                        dismiss()
+                      } label: {
+                        Label("Edit", systemImage: "pencil")
+                      }
+                      .tint(Color.woodPrimary)
+
+                      Button {
+                        selectedOrder = order
+                      } label: {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                      }
+                      .tint(Color.forestGreen)
+                    }
+                }
+              }
+              .padding(.horizontal, 20)
+              .padding(.bottom, 20)
+            }
+          } else {
+            // Table View for larger iPads
+            // Table Header
+            HStack(spacing: 12) {
+              Text("Order Name")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.darkBrown)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+              Text("Date")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.darkBrown)
+                .frame(width: 100, alignment: .leading)
+
+              Text("Time")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.darkBrown)
+                .frame(width: 80, alignment: .leading)
+
+              Text("Total")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.darkBrown)
+                .frame(minWidth: 80, alignment: .trailing)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color.woodPrimary.opacity(0.2))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             .padding(.horizontal, 20)
-            .padding(.bottom, 20)
+
+            // Orders List
+            ScrollView {
+              VStack(spacing: 8) {
+                ForEach(savedOrders) { order in
+                  OrderRow(order: order)
+                    .onTapGesture {
+                      selectedOrder = order
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                      Button(role: .destructive) {
+                        deleteOrder(order)
+                      } label: {
+                        Label("Delete", systemImage: "trash")
+                      }
+
+                      Button {
+                        orderToEdit = order
+                        dismiss()
+                      } label: {
+                        Label("Edit", systemImage: "pencil")
+                      }
+                      .tint(Color.woodPrimary)
+
+                      Button {
+                        selectedOrder = order
+                      } label: {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                      }
+                      .tint(Color.forestGreen)
+                    }
+                }
+              }
+              .padding(.horizontal, 20)
+              .padding(.bottom, 20)
+            }
           }
         }
       }
@@ -118,14 +209,31 @@ struct HistoryView: View {
     .onAppear {
       loadOrders()
     }
-    .sheet(isPresented: $showingOrderDetail) {
-      if let order = selectedOrder {
-        OrderDetailView(
-          order: order,
-          onDelete: {
-            deleteOrder(order)
-            showingOrderDetail = false
-          })
+    .sheet(item: $selectedOrder) { order in
+      OrderDetailView(
+        order: order,
+        onDelete: {
+          deleteOrder(order)
+          selectedOrder = nil
+        })
+    }
+    .alert("Delete All Orders", isPresented: $showingDeleteAllConfirmation) {
+      Button("Cancel", role: .cancel) {}
+      Button("Delete All", role: .destructive) {
+        deleteAllOrders()
+      }
+    } message: {
+      Text(
+        "Are you sure you want to delete all \(savedOrders.count) orders? This cannot be undone.")
+    }
+    .onDisappear {
+      // Pass edited order back to calculator
+      if let order = orderToEdit {
+        NotificationCenter.default.post(
+          name: .loadOrderForEditing,
+          object: nil,
+          userInfo: ["order": order]
+        )
       }
     }
   }
@@ -138,14 +246,21 @@ struct HistoryView: View {
     OrderPersistenceManager.shared.deleteOrder(order)
     loadOrders()
   }
+
+  private func deleteAllOrders() {
+    for order in savedOrders {
+      OrderPersistenceManager.shared.deleteOrder(order)
+    }
+    loadOrders()
+  }
 }
 
-// MARK: - Order Row
+// MARK: - Order Row (for Table View)
 struct OrderRow: View {
   let order: SavedOrder
 
   var body: some View {
-    HStack(spacing: 8) {
+    HStack(spacing: 12) {
       Text(order.orderName)
         .font(.subheadline)
         .fontWeight(.medium)
@@ -156,24 +271,94 @@ struct OrderRow: View {
       Text(order.dateSaved.formatted(date: .numeric, time: .omitted))
         .font(.caption)
         .foregroundColor(.darkBrown.opacity(0.7))
-        .frame(width: 80, alignment: .leading)
+        .frame(width: 100, alignment: .leading)
 
       Text(order.dateSaved.formatted(date: .omitted, time: .shortened))
         .font(.caption)
         .foregroundColor(.darkBrown.opacity(0.7))
-        .frame(width: 70, alignment: .leading)
+        .frame(width: 80, alignment: .leading)
 
       Text("$\(String(format: "%.2f", order.totalCost))")
         .font(.subheadline)
         .fontWeight(.semibold)
         .foregroundColor(.forestGreen)
-        .frame(width: 70, alignment: .trailing)
+        .frame(minWidth: 80, alignment: .trailing)
+        .fixedSize(horizontal: true, vertical: false)
     }
     .padding(.horizontal, 16)
     .padding(.vertical, 12)
     .background(Color.white.opacity(0.7))
     .clipShape(RoundedRectangle(cornerRadius: 8))
     .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+  }
+}
+
+// MARK: - Order Card (for Card View)
+struct OrderCard: View {
+  let order: SavedOrder
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      // Order Name - Bold at top left
+      Text(order.orderName)
+        .font(.headline)
+        .fontWeight(.bold)
+        .foregroundColor(.darkBrown)
+        .lineLimit(2)
+
+      // Date and Time
+      HStack(spacing: 4) {
+        Image(systemName: "calendar")
+          .font(.caption)
+          .foregroundColor(.darkBrown.opacity(0.6))
+
+        Text(order.dateSaved.formatted(date: .abbreviated, time: .omitted))
+          .font(.subheadline)
+          .foregroundColor(.darkBrown.opacity(0.7))
+
+        Text("•")
+          .foregroundColor(.darkBrown.opacity(0.4))
+
+        Image(systemName: "clock")
+          .font(.caption)
+          .foregroundColor(.darkBrown.opacity(0.6))
+
+        Text(order.dateSaved.formatted(date: .omitted, time: .shortened))
+          .font(.subheadline)
+          .foregroundColor(.darkBrown.opacity(0.7))
+      }
+
+      Divider()
+
+      // Total Price - Highlighted
+      HStack {
+        Text("Total:")
+          .font(.subheadline)
+          .fontWeight(.medium)
+          .foregroundColor(.darkBrown)
+
+        Spacer()
+
+        Text("$\(String(format: "%.2f", order.totalCost))")
+          .font(.title3)
+          .fontWeight(.bold)
+          .foregroundColor(.forestGreen)
+      }
+    }
+    .padding(16)
+    .background(
+      LinearGradient(
+        colors: [Color.white, Color.white.opacity(0.95)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+      )
+    )
+    .clipShape(RoundedRectangle(cornerRadius: 12))
+    .overlay(
+      RoundedRectangle(cornerRadius: 12)
+        .stroke(Color.woodPrimary.opacity(0.3), lineWidth: 1.5)
+    )
+    .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
   }
 }
 

@@ -144,6 +144,17 @@ struct BoardFootCalculatorView: View {
       if let savedBoards = OrderPersistenceManager.shared.loadWorkInProgress() {
         viewModel.boards = savedBoards
       }
+
+      // Listen for orders being loaded for editing
+      NotificationCenter.default.addObserver(
+        forName: .loadOrderForEditing,
+        object: nil,
+        queue: .main
+      ) { notification in
+        if let order = notification.userInfo?["order"] as? SavedOrder {
+          viewModel.boards = order.boards
+        }
+      }
     }
     .onChange(of: viewModel.boards) { oldValue, newValue in
       // Auto-save work in progress

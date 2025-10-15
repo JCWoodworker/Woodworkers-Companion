@@ -7,6 +7,11 @@
 
 import Foundation
 
+// MARK: - Notification Names
+extension Notification.Name {
+  static let loadOrderForEditing = Notification.Name("loadOrderForEditing")
+}
+
 // MARK: - Saved Order
 struct SavedOrder: Identifiable, Codable {
   let id: UUID

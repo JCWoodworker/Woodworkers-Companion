@@ -222,11 +222,19 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
 - **Running Totals**: Automatically calculates total board feet and total cost
 - **Order History**: Save and manage multiple orders with full history
   - Auto-save on export
-  - Manual save buttons in multiple locations
+  - Manual save buttons (only appears when boards are added)
   - Work-in-progress persistence (survives app restarts)
   - Optional custom order names
-  - Chronological table view with order name, date, time, and total cost
+  - Responsive layout:
+    - **Table view** on larger iPads (order name, date, time, total cost)
+    - **Card view** on iPhones and iPad mini (beautifully designed cards)
+  - Swipe actions on each order:
+    - Delete individual order
+    - Edit (loads order back into calculator)
+    - Share order details
+  - Delete All button to clear entire history (with confirmation)
   - View, share, print, or delete saved orders
+  - Form resets completely after saving an order
 - **Export/Share**: Export calculations as formatted text for sharing or saving
 
 **How to Use:**
@@ -249,8 +257,13 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
    - Work is automatically saved if you close the app
 8. **View History**:
    - Tap "History" button in top right corner
-   - View all saved orders in chronological table
-   - Tap any order to view full details
+   - View all saved orders (table on iPad, cards on iPhone)
+   - **Tap** any order to view full details
+   - **Swipe left** on any order for quick actions:
+     - Delete this order
+     - Edit (loads order back into calculator)
+     - Share
+   - Use "Delete All" button to clear entire history
    - Share, print, or delete orders from detail view
 9. Export or share your calculations when done
 
@@ -260,7 +273,7 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
 - `BoardFootViewModel.swift` - State management
 - `SavedOrderModels.swift` - Order history models and persistence
 - `SaveOrderView.swift` - Order naming popup
-- `HistoryView.swift` - Order history table view
+- `HistoryView.swift` - Order history (responsive table/card view)
 - `OrderDetailView.swift` - Individual order detail with share/print
 
 ## Color Extensions
