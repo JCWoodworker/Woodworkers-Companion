@@ -76,40 +76,41 @@ struct HistoryView: View {
           // Show cards for compact devices, table for regular
           if isCompactDevice {
             // Card View for iPhone and iPad mini
-            ScrollView {
-              VStack(spacing: 12) {
-                ForEach(savedOrders) { order in
-                  OrderCard(order: order)
-                    .onTapGesture {
+            List {
+              ForEach(savedOrders) { order in
+                OrderCard(order: order)
+                  .listRowBackground(Color.clear)
+                  .listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
+                  .listRowSeparator(.hidden)
+                  .onTapGesture {
+                    selectedOrder = order
+                  }
+                  .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                      deleteOrder(order)
+                    } label: {
+                      Label("Delete", systemImage: "trash")
+                    }
+
+                    Button {
+                      orderToEdit = order
+                      dismiss()
+                    } label: {
+                      Label("Edit", systemImage: "pencil")
+                    }
+                    .tint(Color.woodPrimary)
+
+                    Button {
                       selectedOrder = order
+                    } label: {
+                      Label("Share", systemImage: "square.and.arrow.up")
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                      Button(role: .destructive) {
-                        deleteOrder(order)
-                      } label: {
-                        Label("Delete", systemImage: "trash")
-                      }
-
-                      Button {
-                        orderToEdit = order
-                        dismiss()
-                      } label: {
-                        Label("Edit", systemImage: "pencil")
-                      }
-                      .tint(Color.woodPrimary)
-
-                      Button {
-                        selectedOrder = order
-                      } label: {
-                        Label("Share", systemImage: "square.and.arrow.up")
-                      }
-                      .tint(Color.forestGreen)
-                    }
-                }
+                    .tint(Color.forestGreen)
+                  }
               }
-              .padding(.horizontal, 20)
-              .padding(.bottom, 20)
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
           } else {
             // Table View for larger iPads
             // Table Header
@@ -145,40 +146,41 @@ struct HistoryView: View {
             .padding(.horizontal, 20)
 
             // Orders List
-            ScrollView {
-              VStack(spacing: 8) {
-                ForEach(savedOrders) { order in
-                  OrderRow(order: order)
-                    .onTapGesture {
+            List {
+              ForEach(savedOrders) { order in
+                OrderRow(order: order)
+                  .listRowBackground(Color.clear)
+                  .listRowInsets(EdgeInsets(top: 4, leading: 20, bottom: 4, trailing: 20))
+                  .listRowSeparator(.hidden)
+                  .onTapGesture {
+                    selectedOrder = order
+                  }
+                  .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                      deleteOrder(order)
+                    } label: {
+                      Label("Delete", systemImage: "trash")
+                    }
+
+                    Button {
+                      orderToEdit = order
+                      dismiss()
+                    } label: {
+                      Label("Edit", systemImage: "pencil")
+                    }
+                    .tint(Color.woodPrimary)
+
+                    Button {
                       selectedOrder = order
+                    } label: {
+                      Label("Share", systemImage: "square.and.arrow.up")
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                      Button(role: .destructive) {
-                        deleteOrder(order)
-                      } label: {
-                        Label("Delete", systemImage: "trash")
-                      }
-
-                      Button {
-                        orderToEdit = order
-                        dismiss()
-                      } label: {
-                        Label("Edit", systemImage: "pencil")
-                      }
-                      .tint(Color.woodPrimary)
-
-                      Button {
-                        selectedOrder = order
-                      } label: {
-                        Label("Share", systemImage: "square.and.arrow.up")
-                      }
-                      .tint(Color.forestGreen)
-                    }
-                }
+                    .tint(Color.forestGreen)
+                  }
               }
-              .padding(.horizontal, 20)
-              .padding(.bottom, 20)
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
           }
         }
       }

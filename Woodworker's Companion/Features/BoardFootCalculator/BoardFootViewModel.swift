@@ -114,6 +114,12 @@ class BoardFootViewModel {
     boards.removeAll { $0.id == board.id }
   }
 
+  func updateBoard(_ updatedBoard: BoardEntry) {
+    if let index = boards.firstIndex(where: { $0.id == updatedBoard.id }) {
+      boards[index] = updatedBoard
+    }
+  }
+
   func clearAll() {
     boards.removeAll()
     thickness = ""

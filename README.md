@@ -219,6 +219,7 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
 - **Individual Board Pricing**: Each board can have its own price and pricing type
 - **Price Persistence**: Price persists across board entries until changed
 - **Multiple Board Management**: Add different boards with different prices to calculate total project cost
+- **Edit Individual Boards**: Tap any board in the list to edit its dimensions, quantity, price, or pricing type
 - **Running Totals**: Automatically calculates total board feet and total cost
 - **Order History**: Save and manage multiple orders with full history
   - Auto-save on export
@@ -249,13 +250,14 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
    - Quantity
 4. Enter price (optional - persists for subsequent boards until changed)
 5. Tap "Add Board" to add to your list
-6. View individual board costs and totals in the summary section
-7. **Save your order**:
+6. **Edit boards**: Tap any board in the "Added Boards" list to edit all its values
+7. View individual board costs and totals in the summary section
+8. **Save your order**:
    - Tap "Save Order" button (appears above inputs and at top of board list)
    - Optionally name your order or skip to auto-generate
    - Order is automatically saved when you export
    - Work is automatically saved if you close the app
-8. **View History**:
+9. **View History**:
    - Tap "History" button in top right corner
    - View all saved orders (table on iPad, cards on iPhone)
    - **Tap** any order to view full details
@@ -265,7 +267,7 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
      - Share
    - Use "Delete All" button to clear entire history
    - Share, print, or delete orders from detail view
-9. Export or share your calculations when done
+10. Export or share your calculations when done
 
 **Files:**
 - `BoardFootCalculatorView.swift` - Main UI
@@ -275,6 +277,7 @@ A comprehensive calculator for woodworkers to calculate board feet for lumber pr
 - `SaveOrderView.swift` - Order naming popup
 - `HistoryView.swift` - Order history (responsive table/card view)
 - `OrderDetailView.swift` - Individual order detail with share/print
+- `EditBoardView.swift` - Edit individual board dialog
 
 ## Color Extensions
 

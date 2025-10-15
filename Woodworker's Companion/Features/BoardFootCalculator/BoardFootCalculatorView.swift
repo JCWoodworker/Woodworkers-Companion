@@ -13,6 +13,7 @@ struct BoardFootCalculatorView: View {
   @State private var showingExportSheet = false
   @State private var showingSaveOrderSheet = false
   @State private var showingHistory = false
+  @State private var selectedBoardToEdit: BoardEntry? = nil
 
   var body: some View {
     ZStack(alignment: .topLeading) {
@@ -54,7 +55,11 @@ struct BoardFootCalculatorView: View {
 
           // Board List
           if !viewModel.boards.isEmpty {
-            BoardListView(viewModel: viewModel)
+            BoardListView(
+              viewModel: viewModel,
+              onEditBoard: { board in
+                selectedBoardToEdit = board
+              })
           }
 
           // Summary Section
@@ -159,6 +164,11 @@ struct BoardFootCalculatorView: View {
     .onChange(of: viewModel.boards) { oldValue, newValue in
       // Auto-save work in progress
       OrderPersistenceManager.shared.saveWorkInProgress(boards: newValue)
+    }
+    .sheet(item: $selectedBoardToEdit) { board in
+      EditBoardView(board: board) { updatedBoard in
+        viewModel.updateBoard(updatedBoard)
+      }
     }
   }
 
@@ -462,6 +472,7 @@ struct LengthInputFieldWithToggle: View {
 // MARK: - Board List View
 struct BoardListView: View {
   @Bindable var viewModel: BoardFootViewModel
+  let onEditBoard: (BoardEntry) -> Void
 
   var body: some View {
     VStack(spacing: 12) {
@@ -473,6 +484,9 @@ struct BoardListView: View {
       VStack(spacing: 8) {
         ForEach(viewModel.boards) { board in
           BoardRowView(board: board, viewModel: viewModel)
+            .onTapGesture {
+              onEditBoard(board)
+            }
         }
       }
     }
