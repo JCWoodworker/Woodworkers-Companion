@@ -105,43 +105,55 @@ struct ToolTile: View {
 
 // MARK: - Main Content View
 struct ContentView: View {
-  // Adaptive grid columns
+  // Fixed grid columns - maximum 3 per row
   let columns = [
-    GridItem(.adaptive(minimum: 150, maximum: 200), spacing: 16)
+    GridItem(.flexible(), spacing: 16),
+    GridItem(.flexible(), spacing: 16),
+    GridItem(.flexible(), spacing: 16),
   ]
 
   var body: some View {
-    ScrollView {
-      VStack(spacing: 30) {
-        // Logo
-        Image("AppIcon")
-          .resizable()
-          .aspectRatio(contentMode: .fit)
-          .frame(width: 100, height: 100)
-          .clipShape(RoundedRectangle(cornerRadius: 20))
-          .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
-          .padding(.top, 40)
+    GeometryReader { geometry in
+      let maxWidth: CGFloat = min(geometry.size.width, 700)
+      let horizontalPadding: CGFloat = 24
+      let availableWidth = maxWidth - (horizontalPadding * 2)
+      let spacing: CGFloat = 16
+      let tileSize = (availableWidth - (spacing * 2)) / 3
 
-        // Caption
-        Text("A collection of tools for woodworkers")
-          .font(.title3)
-          .fontWeight(.medium)
-          .foregroundColor(.darkBrown)
-          .multilineTextAlignment(.center)
-          .kerning(1.0)
-          .padding(.horizontal, 20)
+      ScrollView {
+        VStack(spacing: 30) {
+          // Logo - same size as tiles
+          Image("Logo")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: tileSize, height: tileSize)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+            .padding(.top, 40)
 
-        // Tool Grid
-        LazyVGrid(columns: columns, spacing: 16) {
-          ForEach(1...9, id: \.self) { number in
-            ToolTile(number: number)
+          // Caption
+          Text("A collection of tools for woodworkers")
+            .font(.title3)
+            .fontWeight(.medium)
+            .foregroundColor(.darkBrown)
+            .multilineTextAlignment(.center)
+            .kerning(1.0)
+            .padding(.horizontal, 20)
+
+          // Tool Grid - centered with padding
+          LazyVGrid(columns: columns, spacing: 16) {
+            ForEach(1...9, id: \.self) { number in
+              ToolTile(number: number)
+            }
           }
+          .padding(.horizontal, 24)
+          .padding(.bottom, 40)
+          .frame(maxWidth: 700)  // Reasonable max width for larger devices
         }
-        .padding(.horizontal, 20)
-        .padding(.bottom, 40)
+        .frame(maxWidth: .infinity)  // Center the content
       }
+      .background(Color.creamBackground.ignoresSafeArea())
     }
-    .background(Color.creamBackground.ignoresSafeArea())
   }
 }
 
