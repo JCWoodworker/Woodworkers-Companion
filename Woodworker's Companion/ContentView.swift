@@ -47,49 +47,51 @@ extension Color {
 
 // MARK: - Tool Tile Component
 struct ToolTile: View {
-  let number: Int
+  let tool: Tool
   @State private var isPressed = false
 
   var body: some View {
-    ZStack {
-      // Tile background with gradient
-      RoundedRectangle(cornerRadius: 12)
-        .fill(
-          LinearGradient(
-            gradient: Gradient(colors: [
-              Color.woodSecondary.opacity(isPressed ? 0.7 : 1.0),
-              Color.woodPrimary.opacity(isPressed ? 0.8 : 1.0),
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-          )
-        )
-        .shadow(
-          color: isPressed ? Color.black.opacity(0.1) : Color.black.opacity(0.3),
-          radius: isPressed ? 2 : 6,
-          x: 0,
-          y: isPressed ? 1 : 4
-        )
-
-      // Inner shadow effect when pressed
-      if isPressed {
+    NavigationLink(destination: destinationView(for: tool.id)) {
+      ZStack {
+        // Tile background with gradient
         RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.black.opacity(0.2), lineWidth: 1)
-          .blur(radius: 2)
-          .offset(x: 0, y: 1)
-      }
+          .fill(
+            LinearGradient(
+              gradient: Gradient(colors: [
+                Color.woodSecondary.opacity(isPressed ? 0.7 : 1.0),
+                Color.woodPrimary.opacity(isPressed ? 0.8 : 1.0),
+              ]),
+              startPoint: .topLeading,
+              endPoint: .bottomTrailing
+            )
+          )
+          .shadow(
+            color: isPressed ? Color.black.opacity(0.1) : Color.black.opacity(0.3),
+            radius: isPressed ? 2 : 6,
+            x: 0,
+            y: isPressed ? 1 : 4
+          )
 
-      // Tile label
-      Text("Tool \(number)")
-        .font(.title2)
-        .fontWeight(.bold)
-        .foregroundColor(.white)
-        .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+        // Inner shadow effect when pressed
+        if isPressed {
+          RoundedRectangle(cornerRadius: 12)
+            .stroke(Color.black.opacity(0.2), lineWidth: 1)
+            .blur(radius: 2)
+            .offset(x: 0, y: 1)
+        }
+
+        // Tile label
+        Text(tool.name)
+          .font(.title2)
+          .fontWeight(.bold)
+          .foregroundColor(.white)
+          .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+      }
+      .aspectRatio(1.0, contentMode: .fit)
+      .scaleEffect(isPressed ? 0.97 : 1.0)
+      .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
     }
-    .aspectRatio(1.0, contentMode: .fit)
-    .scaleEffect(isPressed ? 0.97 : 1.0)
-    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
-    .gesture(
+    .simultaneousGesture(
       DragGesture(minimumDistance: 0)
         .onChanged { _ in
           if !isPressed {
@@ -101,10 +103,29 @@ struct ToolTile: View {
         }
     )
   }
+
+  @ViewBuilder
+  private func destinationView(for toolId: Int) -> some View {
+    switch toolId {
+    case 1: Tool1View()
+    case 2: Tool2View()
+    case 3: Tool3View()
+    case 4: Tool4View()
+    case 5: Tool5View()
+    case 6: Tool6View()
+    case 7: Tool7View()
+    case 8: Tool8View()
+    case 9: Tool9View()
+    default: Text("Tool not found")
+    }
+  }
 }
 
 // MARK: - Main Content View
 struct ContentView: View {
+  // Get all tools dynamically - add/remove from Tool.allTools to grow/shrink grid
+  let tools = Tool.allTools
+
   // Fixed grid columns - maximum 3 per row
   let columns = [
     GridItem(.flexible(), spacing: 16),
@@ -113,46 +134,49 @@ struct ContentView: View {
   ]
 
   var body: some View {
-    GeometryReader { geometry in
-      let maxWidth: CGFloat = min(geometry.size.width, 700)
-      let horizontalPadding: CGFloat = 24
-      let availableWidth = maxWidth - (horizontalPadding * 2)
-      let spacing: CGFloat = 16
-      let tileSize = (availableWidth - (spacing * 2)) / 3
+    NavigationStack {
+      GeometryReader { geometry in
+        let maxWidth: CGFloat = min(geometry.size.width, 700)
+        let horizontalPadding: CGFloat = 24
+        let availableWidth = maxWidth - (horizontalPadding * 2)
+        let spacing: CGFloat = 16
+        let tileSize = (availableWidth - (spacing * 2)) / 3
 
-      ScrollView {
-        VStack(spacing: 30) {
-          // Logo - same size as tiles
-          Image("Logo")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(width: tileSize, height: tileSize)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
-            .padding(.top, 40)
+        ScrollView {
+          VStack(spacing: 30) {
+            // Logo - same size as tiles
+            Image("Logo")
+              .resizable()
+              .aspectRatio(contentMode: .fit)
+              .frame(width: tileSize, height: tileSize)
+              .clipShape(RoundedRectangle(cornerRadius: 20))
+              .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+              .padding(.top, 40)
 
-          // Caption
-          Text("A collection of tools for woodworkers")
-            .font(.title3)
-            .fontWeight(.medium)
-            .foregroundColor(.darkBrown)
-            .multilineTextAlignment(.center)
-            .kerning(1.0)
-            .padding(.horizontal, 20)
+            // Caption
+            Text("A collection of tools for woodworkers")
+              .font(.title3)
+              .fontWeight(.medium)
+              .foregroundColor(.darkBrown)
+              .multilineTextAlignment(.center)
+              .kerning(1.0)
+              .padding(.horizontal, 20)
 
-          // Tool Grid - centered with padding
-          LazyVGrid(columns: columns, spacing: 16) {
-            ForEach(1...9, id: \.self) { number in
-              ToolTile(number: number)
+            // Tool Grid - centered with padding, dynamically sized
+            LazyVGrid(columns: columns, spacing: 16) {
+              ForEach(tools) { tool in
+                ToolTile(tool: tool)
+              }
             }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 40)
+            .frame(maxWidth: 700)  // Reasonable max width for larger devices
           }
-          .padding(.horizontal, 24)
-          .padding(.bottom, 40)
-          .frame(maxWidth: 700)  // Reasonable max width for larger devices
+          .frame(maxWidth: .infinity)  // Center the content
         }
-        .frame(maxWidth: .infinity)  // Center the content
+        .background(Color.creamBackground.ignoresSafeArea())
       }
-      .background(Color.creamBackground.ignoresSafeArea())
+      .navigationBarHidden(true)
     }
   }
 }
