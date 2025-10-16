@@ -1,5 +1,5 @@
 //
-//  Tool9View.swift
+//  InventoryManagementView.swift
 //  Woodworker's Companion
 //
 //  Created by James Corey on 10/15/25.
@@ -7,19 +7,31 @@
 
 import SwiftUI
 
-struct Tool9View: View {
+struct InventoryManagementView: View {
   @Environment(\.dismiss) private var dismiss
-  
+  let inDevelopment: Bool
+
   var body: some View {
     ZStack {
       Color.creamBackground.ignoresSafeArea()
-      
-      // Centered tool number
-      Text("Tool 9")
-        .font(.largeTitle)
-        .fontWeight(.bold)
-        .foregroundColor(.darkBrown)
-      
+
+      VStack(spacing: 20) {
+        // Development banner (if applicable)
+        if inDevelopment {
+          DevelopmentBanner()
+            .padding(.top, 60)
+        }
+
+        // Centered tool title
+        Text("Inventory Management")
+          .font(.largeTitle)
+          .fontWeight(.bold)
+          .foregroundColor(.darkBrown)
+          .padding(.top, inDevelopment ? 0 : 60)
+
+        Spacer()
+      }
+
       // Home button in top left
       VStack {
         HStack {
@@ -34,10 +46,10 @@ struct Tool9View: View {
           }
           .padding(.leading, 20)
           .padding(.top, 20)
-          
+
           Spacer()
         }
-        
+
         Spacer()
       }
     }
@@ -46,6 +58,5 @@ struct Tool9View: View {
 }
 
 #Preview {
-  Tool9View()
+  InventoryManagementView(inDevelopment: true)
 }
-

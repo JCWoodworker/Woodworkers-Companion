@@ -49,6 +49,7 @@ extension Color {
 struct ToolTile: View {
   let tool: Tool
   @State private var isPressed = false
+  @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
   var body: some View {
     NavigationLink(destination: destinationView(for: tool.id)) {
@@ -82,8 +83,9 @@ struct ToolTile: View {
 
         // Tile label - fixed size for consistency
         GeometryReader { geo in
+          let fontSizePercentage: CGFloat = horizontalSizeClass == .compact ? 0.128 : 0.16
           Text(tool.name)
-            .font(.system(size: geo.size.width * 0.16))  // 16% of tile width
+            .font(.system(size: geo.size.width * fontSizePercentage))  // 12.8% for iPhone, 16% for iPad
             .fontWeight(.bold)
             .foregroundColor(.white)
             .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
@@ -113,16 +115,18 @@ struct ToolTile: View {
 
   @ViewBuilder
   private func destinationView(for toolId: Int) -> some View {
+    let isInDevelopment = Tool.allTools.first(where: { $0.id == toolId })?.inDevelopment ?? false
+
     switch toolId {
     case 1: BoardFootCalculatorView()
-    case 2: Tool2View()
-    case 3: Tool3View()
-    case 4: Tool4View()
-    case 5: Tool5View()
-    case 6: Tool6View()
-    case 7: Tool7View()
-    case 8: Tool8View()
-    case 9: Tool9View()
+    case 2: CutListOptimizer(inDevelopment: isInDevelopment)
+    case 3: ProjectPricingEngineView(inDevelopment: isInDevelopment)
+    case 4: FinishMixingCalculatorView(inDevelopment: isInDevelopment)
+    case 5: ProjectManagementView(inDevelopment: isInDevelopment)
+    case 6: QuotingAndInvoicingView(inDevelopment: isInDevelopment)
+    case 7: InventoryManagementView(inDevelopment: isInDevelopment)
+    case 8: DigitalSketchpadView(inDevelopment: isInDevelopment)
+    case 9: ReferenceLibrariesView(inDevelopment: isInDevelopment)
     default: Text("Tool not found")
     }
   }

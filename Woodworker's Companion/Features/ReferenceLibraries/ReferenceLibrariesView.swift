@@ -1,5 +1,5 @@
 //
-//  Tool2View.swift
+//  ReferenceLibrariesView.swift
 //  Woodworker's Companion
 //
 //  Created by James Corey on 10/15/25.
@@ -7,18 +7,30 @@
 
 import SwiftUI
 
-struct Tool2View: View {
+struct ReferenceLibrariesView: View {
   @Environment(\.dismiss) private var dismiss
+  let inDevelopment: Bool
 
   var body: some View {
     ZStack {
       Color.creamBackground.ignoresSafeArea()
 
-      // Centered tool number
-      Text("Tool 2")
-        .font(.largeTitle)
-        .fontWeight(.bold)
-        .foregroundColor(.darkBrown)
+      VStack(spacing: 20) {
+        // Development banner (if applicable)
+        if inDevelopment {
+          DevelopmentBanner()
+            .padding(.top, 60)
+        }
+
+        // Centered tool title
+        Text("Reference Libraries")
+          .font(.largeTitle)
+          .fontWeight(.bold)
+          .foregroundColor(.darkBrown)
+          .padding(.top, inDevelopment ? 0 : 60)
+
+        Spacer()
+      }
 
       // Home button in top left
       VStack {
@@ -46,5 +58,5 @@ struct Tool2View: View {
 }
 
 #Preview {
-  Tool2View()
+  ReferenceLibrariesView(inDevelopment: true)
 }
