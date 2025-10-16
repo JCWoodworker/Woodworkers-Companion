@@ -80,12 +80,19 @@ struct ToolTile: View {
             .offset(x: 0, y: 1)
         }
 
-        // Tile label
-        Text(tool.name)
-          .font(.title2)
-          .fontWeight(.bold)
-          .foregroundColor(.white)
-          .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+        // Tile label - fixed size for consistency
+        GeometryReader { geo in
+          Text(tool.name)
+            .font(.system(size: geo.size.width * 0.16))  // 16% of tile width
+            .fontWeight(.bold)
+            .foregroundColor(.white)
+            .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+            .multilineTextAlignment(.center)
+            .lineLimit(3)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+        }
       }
       .aspectRatio(1.0, contentMode: .fit)
       .scaleEffect(isPressed ? 0.97 : 1.0)
@@ -126,12 +133,20 @@ struct ContentView: View {
   // Get all tools dynamically - add/remove from Tool.allTools to grow/shrink grid
   let tools = Tool.allTools
 
-  // Fixed grid columns - maximum 3 per row
-  let columns = [
-    GridItem(.flexible(), spacing: 16),
-    GridItem(.flexible(), spacing: 16),
-    GridItem(.flexible(), spacing: 16),
-  ]
+  // Detect device type
+  @Environment(\.horizontalSizeClass) var horizontalSizeClass
+
+  // Dynamic columns based on device type
+  var columns: [GridItem] {
+    // Use 2 columns for iPhone (compact), 3 for iPad (regular)
+    let columnCount = horizontalSizeClass == .compact ? 2 : 3
+    return Array(repeating: GridItem(.flexible(), spacing: 16), count: columnCount)
+  }
+
+  // Calculate column count for tile size
+  var columnCount: Int {
+    horizontalSizeClass == .compact ? 2 : 3
+  }
 
   var body: some View {
     NavigationStack {
@@ -140,7 +155,8 @@ struct ContentView: View {
         let horizontalPadding: CGFloat = 24
         let availableWidth = maxWidth - (horizontalPadding * 2)
         let spacing: CGFloat = 16
-        let tileSize = (availableWidth - (spacing * 2)) / 3
+        let tileSize =
+          (availableWidth - (spacing * CGFloat(columnCount - 1))) / CGFloat(columnCount)
 
         ScrollView {
           VStack(spacing: 30) {
