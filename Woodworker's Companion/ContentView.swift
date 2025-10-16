@@ -115,18 +115,20 @@ struct ToolTile: View {
 
   @ViewBuilder
   private func destinationView(for toolId: Int) -> some View {
-    let isInDevelopment = Tool.allTools.first(where: { $0.id == toolId })?.inDevelopment ?? false
+    let tool = Tool.allTools.first(where: { $0.id == toolId })
+    let isInDevelopment = tool?.inDevelopment ?? false
+    let summary = tool?.summary ?? ""
 
     switch toolId {
-    case 1: BoardFootCalculatorView()
-    case 2: CutListOptimizer(inDevelopment: isInDevelopment)
-    case 3: ProjectPricingEngineView(inDevelopment: isInDevelopment)
-    case 4: FinishMixingCalculatorView(inDevelopment: isInDevelopment)
-    case 5: ProjectManagementView(inDevelopment: isInDevelopment)
-    case 6: QuotingAndInvoicingView(inDevelopment: isInDevelopment)
-    case 7: InventoryManagementView(inDevelopment: isInDevelopment)
-    case 8: DigitalSketchpadView(inDevelopment: isInDevelopment)
-    case 9: ReferenceLibrariesView(inDevelopment: isInDevelopment)
+    case 1: BoardFootCalculatorView(summary: summary)
+    case 2: CutListOptimizer(inDevelopment: isInDevelopment, summary: summary)
+    case 3: ProjectPricingEngineView(inDevelopment: isInDevelopment, summary: summary)
+    case 4: FinishMixingCalculatorView(inDevelopment: isInDevelopment, summary: summary)
+    case 5: ProjectManagementView(inDevelopment: isInDevelopment, summary: summary)
+    case 6: QuotingAndInvoicingView(inDevelopment: isInDevelopment, summary: summary)
+    case 7: InventoryManagementView(inDevelopment: isInDevelopment, summary: summary)
+    case 8: DigitalSketchpadView(inDevelopment: isInDevelopment, summary: summary)
+    case 9: ReferenceLibrariesView(inDevelopment: isInDevelopment, summary: summary)
     default: Text("Tool not found")
     }
   }
@@ -164,13 +166,14 @@ struct ContentView: View {
 
         ScrollView {
           VStack(spacing: 30) {
-            // Logo - same size as tiles
-            Image("Logo")
+            // Logo - banner style across the top
+            Image("WWC-Banner")
               .resizable()
               .aspectRatio(contentMode: .fit)
-              .frame(width: tileSize, height: tileSize)
-              .clipShape(RoundedRectangle(cornerRadius: 20))
+              .frame(maxWidth: maxWidth - 40)
+              .clipShape(RoundedRectangle(cornerRadius: 12))
               .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+              .padding(.horizontal, 20)
               .padding(.top, 40)
 
             // Caption

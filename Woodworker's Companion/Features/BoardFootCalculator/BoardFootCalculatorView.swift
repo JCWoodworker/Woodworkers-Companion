@@ -14,6 +14,8 @@ struct BoardFootCalculatorView: View {
   @State private var showingSaveOrderSheet = false
   @State private var showingHistory = false
   @State private var selectedBoardToEdit: BoardEntry? = nil
+  @State private var showingSummary = false
+  let summary: String
 
   var body: some View {
     ZStack(alignment: .topLeading) {
@@ -78,19 +80,35 @@ struct BoardFootCalculatorView: View {
         .padding(.horizontal, 20)
       }
 
-      // Home button in top left - above ScrollView
-      Button(action: {
-        dismiss()
-      }) {
-        Image(systemName: "house.fill")
-          .resizable()
-          .aspectRatio(contentMode: .fit)
-          .frame(width: 25, height: 25)
-          .foregroundColor(.darkBrown)
-          .padding(8)
-          .background(Color.white.opacity(0.9))
-          .clipShape(Circle())
-          .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+      // Home button and info button in top left - above ScrollView
+      HStack(spacing: 12) {
+        Button(action: {
+          dismiss()
+        }) {
+          Image(systemName: "house.fill")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 25, height: 25)
+            .foregroundColor(.darkBrown)
+            .padding(8)
+            .background(Color.white.opacity(0.9))
+            .clipShape(Circle())
+            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+        }
+
+        Button(action: {
+          showingSummary = true
+        }) {
+          Image(systemName: "info.circle.fill")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 25, height: 25)
+            .foregroundColor(.darkBrown)
+            .padding(8)
+            .background(Color.white.opacity(0.9))
+            .clipShape(Circle())
+            .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+        }
       }
       .padding(.leading, 20)
       .padding(.top, 20)
@@ -168,6 +186,17 @@ struct BoardFootCalculatorView: View {
     .sheet(item: $selectedBoardToEdit) { board in
       EditBoardView(board: board) { updatedBoard in
         viewModel.updateBoard(updatedBoard)
+      }
+    }
+    .overlay {
+      if showingSummary {
+        ToolSummaryModal(
+          toolName: "Board Foot Calculator",
+          summary: summary,
+          isPresented: $showingSummary
+        )
+        .transition(.opacity)
+        .zIndex(1000)
       }
     }
   }
@@ -806,5 +835,5 @@ struct ExportSheetView: View {
 }
 
 #Preview {
-  BoardFootCalculatorView()
+  BoardFootCalculatorView(summary: ToolSummaries.boardFootCalculator)
 }

@@ -10,6 +10,8 @@ import SwiftUI
 struct QuotingAndInvoicingView: View {
   @Environment(\.dismiss) private var dismiss
   let inDevelopment: Bool
+  let summary: String
+  @State private var showingSummary = false
 
   var body: some View {
     ZStack {
@@ -29,10 +31,16 @@ struct QuotingAndInvoicingView: View {
           .foregroundColor(.darkBrown)
           .padding(.top, inDevelopment ? 0 : 60)
 
+        // Show summary when in development
+        if inDevelopment {
+          ToolSummaryView(summary: summary)
+            .padding(.top, 10)
+        }
+
         Spacer()
       }
 
-      // Home button in top left
+      // Home button (and info button if not in development) in top left
       VStack {
         HStack {
           Button(action: {
@@ -44,19 +52,42 @@ struct QuotingAndInvoicingView: View {
               .frame(width: 25, height: 25)
               .foregroundColor(.darkBrown)
           }
-          .padding(.leading, 20)
-          .padding(.top, 20)
+
+          if !inDevelopment {
+            Button(action: {
+              showingSummary = true
+            }) {
+              Image(systemName: "info.circle.fill")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 25, height: 25)
+                .foregroundColor(.darkBrown)
+            }
+          }
 
           Spacer()
         }
+        .padding(.leading, 20)
+        .padding(.top, 20)
 
         Spacer()
       }
     }
     .toolbar(.hidden, for: .navigationBar)
+    .overlay {
+      if showingSummary {
+        ToolSummaryModal(
+          toolName: "Quoting And Invoicing",
+          summary: summary,
+          isPresented: $showingSummary
+        )
+        .transition(.opacity)
+        .zIndex(1000)
+      }
+    }
   }
 }
 
 #Preview {
-  QuotingAndInvoicingView(inDevelopment: true)
+  QuotingAndInvoicingView(inDevelopment: true, summary: ToolSummaries.quotingAndInvoicing)
 }
