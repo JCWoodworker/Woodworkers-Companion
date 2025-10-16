@@ -83,9 +83,9 @@ struct ToolTile: View {
 
         // Tile label - fixed size for consistency
         GeometryReader { geo in
-          let fontSizePercentage: CGFloat = horizontalSizeClass == .compact ? 0.128 : 0.16
+          let fontSizePercentage: CGFloat = horizontalSizeClass == .compact ? 0.128 : 0.11
           Text(tool.name)
-            .font(.system(size: geo.size.width * fontSizePercentage))  // 12.8% for iPhone, 16% for iPad
+            .font(.system(size: geo.size.width * fontSizePercentage))  // 12.8% for iPhone, 11% for iPad
             .fontWeight(.bold)
             .foregroundColor(.white)
             .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
@@ -175,15 +175,6 @@ struct ContentView: View {
               .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
               .padding(.horizontal, 20)
               .padding(.top, 40)
-
-            // Caption
-            Text("A collection of tools for woodworkers")
-              .font(.title3)
-              .fontWeight(.medium)
-              .foregroundColor(.darkBrown)
-              .multilineTextAlignment(.center)
-              .kerning(1.0)
-              .padding(.horizontal, 20)
 
             // Tool Grid - centered with padding, dynamically sized
             LazyVGrid(columns: columns, spacing: 16) {
